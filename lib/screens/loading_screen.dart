@@ -8,13 +8,12 @@ import 'package:geolocator/geolocator.dart';
 const apiKey = 'fd60364bce87fb67578310a5ee46109c';
 
 class LoadingScreen extends StatefulWidget {
+  late dynamic locationWeather;
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  late double latitude;
-  late double longitude;
 
   @override
   void initState() {
@@ -25,16 +24,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void getLocationData() async {
     Location location = Location();
     await location.getCurrentLocation();
-    longitude = location.longitude;
-    latitude = location.latitude;
-    NetworkHelper networkHelper = NetworkHelper('https://api'
-        '.openweathermap.org/data/2'
-        '.5/weather?lat=$latitude&lon=$longitude&appid'
-        '=$apiKey');
+
+    NetworkHelper networkHelper = NetworkHelper('https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
 
     var weatherData = await networkHelper.getData();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return LocationScreen();
+      return LocationScreen(locationWeather: weatherData,);
     }));
   }
 
