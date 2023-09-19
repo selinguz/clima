@@ -16,7 +16,7 @@ class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weather = WeatherModel();
   late int temperature = 0;
   late String weatherIcon = '';
-  late String city = '';
+  late String cityName = '';
   late String message = '';
 
   @override
@@ -32,14 +32,14 @@ class _LocationScreenState extends State<LocationScreen> {
         temperature = 0;
         weatherIcon = 'Error';
         message = 'Unable to get weather data';
-        city = '';
+        cityName = '';
         return;
       }
       double temp = weatherData['main']['temp'];
       temperature = temp.toInt();
       var conditionNumber = weatherData['weather'][0]['id'];
       weatherIcon = weather.getWeatherIcon(conditionNumber);
-      city = weatherData['name'];
+      cityName = weatherData['name'];
       message = weather.getMessage(temperature);
     });
   }
@@ -76,13 +76,18 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async{
+                      var typedName = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) {
                           return CityScreen();
                         }),
                       );
+                      if(typedName!=null){
+                        var weatherData = await weather.getCityWeather
+                          (typedName);
+                        updateUI(weatherData);
+                      }
                     },
                     child: Icon(
                       Icons.location_city,
@@ -109,7 +114,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  '$message in $city!',
+                  '$message in $cityName!',
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
